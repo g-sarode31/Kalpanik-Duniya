@@ -1,0 +1,2417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalpanik Duniya</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.birds.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Playfair+Display:wght@400;700&display=swap');
+        
+        :root {
+            --primary: #5f2c82;
+            --secondary: #49a09d;
+            --text: #f8f8f8;
+            --dark: #1a1a2e;
+        }
+	
+        body {
+            font-family: 'Amiri', serif;
+            color: var(--text);
+            background-color: var(--dark);
+            overflow-x: hidden;
+        }
+        
+        .heading-font {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .hero {
+            background: 
+                linear-gradient(rgba(26, 26, 46, 0.7), rgba(26, 26, 46, 0.9)),
+                url('https://placehold.co/1920x1080/nature?text=Calligraphy+Ink+Flowing') center/cover no-repeat fixed;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Vanta container - will hold the birds animation */
+        #vanta-birds {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; /* Behind all content */
+        }
+        
+        /* Make sure content is visible on top of the animation */
+        .container, nav, section, footer {
+            position: relative;
+            z-index: 1;
+        }
+        
+		
+        .add-shayari {
+            background: 
+                linear-gradient(rgba(26, 26, 46, 0.7), rgba(26, 26, 46, 0.9)),
+                url('https://placehold.co/1920x1080/nature?text=Calligraphy+Ink+Flowing') center/cover no-repeat fixed;
+            height: 100vh;
+            display: flex; 
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .my-shayaris {
+            background: 
+                linear-gradient(rgba(26, 26, 46, 0.8), rgba(26, 26, 46, 0.95)),
+                url('https://placehold.co/1920x1080/texture?text=Old+Parchment+Paper') center/cover no-repeat fixed;
+        }
+        
+        .shayari-card {
+            background: rgba(255, 255, 255, 0.1);
+            gap: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(256, 255, 255, 0.2);
+            margin-top: 100px;
+            transition: all 0.3s ease;
+        }
+        
+        .shayari-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .mood-romantic { border-left: 5px solid #e84393; }
+        .mood-sad { border-left: 5px solid #0984e3; }
+        .mood-inspirational { border-left: 5px solid #00b894; }
+        .mood-funny { border-left: 5px solid #fdcb6e; }
+        .mood-spiritual { border-left: 5px solid #a55eea; }
+        
+        .nav-link {
+            position: relative;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -3px;
+            left: 0;
+            background: var(--secondary);
+            transition: width 0.3s;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .form-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            transition: all 0.3s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--secondary);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            transition: all 0.3s;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn-secondary {
+            border: 1px solid white;
+            transition: all 0.3s;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--dark);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(var(--primary), var(--secondary));
+            border-radius: 5px;
+        }
+        
+        .floating-nav {
+            background: rgba(26, 26, 46, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .signature {
+            font-family: "Brush Script MT", "Comic Sans MS", cursive;
+            font-size: 2.5rem;
+            color: var(--primary);
+          /*  unicode-bidi: isolate;  */
+        } 
+		
+	/*	.signature {
+            font-family:"Brush Script MT", "Comic Sans MS", cursive;
+            font-size: 2.5rem;
+            color: var(--primary);
+        }
+		*/
+		
+		
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Vanta.js Birds Container -->
+    <div id="vanta-birds"></div>
+    
+    <!-- Floating Navigation -->
+    <nav class="fixed w-full py-4 px-6 z-50 floating-nav">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <!-- Replaced local image path with placeholder -->
+                <img src="data:image/jpeg;base64,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" width='50' height='20' alt="Kalpanik Duniya logo" class="rounded-full">
+                <h1 class="heading-font text-2xl">Kalpanik Duniya</h1>
+            </div>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="#hero31" class="nav-link">Home</a>
+                <a href="#add-shayari" class="nav-link">Add New</a>
+                <a href="#my-shayaris" class="nav-link">Shayari's</a>
+                <a href="#my-Poetry" class="nav-link">Poetry</a>
+                <a href="#about_us" class="nav-link">About Us</a>
+                <a href="login_page_forweb.html" class="nav-link"><i class="fas fa-user mr-2"></i>My Profile</a>
+            </div>
+            <button class="md:hidden text-white text-2xl">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="hero31" class="hero pt-16">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="heading-font text-5xl md:text-6xl font-bold mb-6 leading-tight">
+                Where Your <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-300">Heart Speaks</span> in Verse
+            </h2>
+            <p class="text-xl max-w-2xl mx-auto mb-10">
+                A sacred space for your deepest emotions, beautifully preserved in poetry and shayari
+            </p>
+            <div class="flex justify-center gap-4 flex-wrap">
+                <a href="#add-shayari" class="btn-primary px-8 py-3 rounded-full text-lg">
+                    <i class="fas fa-feather-alt mr-2"></i>Write Now
+                </a>
+                <a href="#my-shayaris" class="btn-secondary px-8 py-3 rounded-full text-lg">
+                    <i class="fas fa-book-open mr-2"></i>Read Collection
+                </a>
+            </div>
+        </div>
+    </section>
+  
+    <!-- Rest of your content remains the same -->
+    <!-- Add Shayari Section --><br><br><br>
+   <section id="add-shayari" class="add-shayari py-20">
+        <div class="container mx-auto px-6">
+            <div class="max-w-3xl mx-auto">
+                <div class="createnewshayari ">  <h1 class="heading-font text-4xl font-bold mb-4 text-center">
+                    <i class="fas fa-feather-alt mr-2"></i>Create New Shayari
+                </h1>
+                <p class="text-xl text-center mb-12">
+                    Let your emotions flow through your words
+                </p>
+                </div>
+                <form id="shayari-form" class="bg-black bg-opacity-30 backdrop-blur-md p-8 rounded-xl border border-white border-opacity-20 shadow-2xl">
+                    <div class="mb-8">
+                        <label class="block text-xl mb-3">Title</label>
+                        <input type="text" 
+                               class="form-input w-full px-4 py-3 rounded-lg text-lg" 
+                               placeholder="Give your Shayari a beautiful title..."
+                               required>
+                    </div>
+                    
+                    <div class="mb-8">
+                        <label class="block text-xl mb-3">Your Shayari/Poem</label>
+                        <textarea 
+                            class="form-input w-full px-4 py-3 rounded-lg h-48 text-lg" 
+                            placeholder="Express what's in your heart..."
+                            required></textarea>
+                    </div>
+                    
+                    <div class="mb-8">
+                        <label class="block text-xl mb-4">Mood</label>
+                        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                            <label class="flex items-center">
+                                <input type="radio" name="mood" value="romantic" class="mr-2" checked>
+                                <span><i class="fas fa-heart mr-1 text-pink-400"></i> Romantic</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="mood" value="sad" class="mr-2">
+                                <span><i class="fas fa-sad-tear mr-1 text-blue-400"></i> Sad</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="mood" value="inspirational" class="mr-2">
+                                <span><i class="fas fa-rocket mr-1 text-green-400"></i> Inspiring</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="mood" value="funny" class="mr-2">
+                                <span><i class="fas fa-grin-squint-tears mr-1 text-yellow-400"></i> Funny</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="mood" value="spiritual" class="mr-2">
+                                <span><i class="fas fa-praying-hands mr-1 text-purple-400"></i> Spiritual</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end gap-4">
+                        <button type="reset" class="btn-secondary px-6 py-2 rounded-lg">
+                            Clear
+                        </button>
+                        <button type="submit" class="btn-primary px-6 py-2 rounded-lg">
+                            <i class="fas fa-save mr-1"></i> Save Poem
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- My Shayaris Section -->
+   <section id="my-shayaris" class="my-shayaris py-20">
+        <div class="container mx-auto px-6">
+            <h2 class="heading-font text-4xl font-bold mb-4 text-center">
+                <i class="fas fa-book-reader mr-2"></i>My Shayari Collection
+            </h2>
+            <p class="text-xl text-center mb-12 max-w-3xl mx-auto">
+                All your beautiful creations in one place, ready to be revisited or shared
+            </p>
+            <!-- Shayaris Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+ <!-- Sample Shayari 1 -->
+                <div class="shayari-card rounded-xl p-6 mood-romantic">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Nahi he</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-heart mr-1"></i> Romantic</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+							Vo naraj he humse ki hum kuch likhte nahi he,<br>
+							Kaha se laye lafj jab humko milte nahi he, <br>
+							Dard ki juban hoti to bata dete shayad,<br> 
+							Vo jakhm kese dikhaye jo dikhte nahi he. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 1 days ago</span>
+                       
+                    </div>
+                </div>
+                
+ <!-- Sample Shayari 2 -->
+                <div class="shayari-card rounded-xl p-6 mood-sad">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Sajaa he </h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i> Sad </span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Rone ki sajja nhi rulane ki Sajaa he, <br>
+							Ye dard mohobat ko nibhane ki Sajaa he, <br>
+							Hasate he to aakho se nikal aate he aasu, <br>
+							Ye us shaksh se dil lagane ki sajaa he. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 2 week ago</span>
+                        
+                    </div>
+                </div>
+              
+<!-- Sample Shayari 3 -->
+                <div class="shayari-card rounded-xl p-6 mood-inspirational">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Na Sake</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-rocket mr-1"></i> Sad </span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Chahne pr aau to chahu ese koi chah na sake, <br>
+							Ruthu to ruthu ese koi mana na sake, <br>
+							Jagu to ese koi sula na sake, <br>
+							Hasu to hasu ese koi rula na sake, <br> 
+							Yaad aau to ese koi bhula na sake, <br>
+							Aur milu to ese koi bichad na sake. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 3 weeks ago</span>
+                       
+                    </div>
+                </div>
+ 
+<!-- Sample Shayari 4 -->
+                <div class="shayari-card rounded-xl p-6 mood-inspirational">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Karte he </h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i> Spiritual </span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Uski hi baat jyada karte he,  <br>
+							Usse milne ka wada karte he, <br>
+							Humse sab gopiya khafa hai ki, <br>
+							Hum har jagah bas radha radha karte hai. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 4 weeks ago</span>
+                       
+                    </div>
+                </div>
+            
+<!-- Sample Shayari 5 -->
+                <div class="shayari-card rounded-xl p-6 mood-romantic">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Pakdega</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-heart mr-1"></i> Romantic</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Din me taare jugnu raat ko pakdega, <br>
+							Badal palko pe barsaat ko pakdega, <br>
+							Aur ek haath se jotega duniya ka rath, <br> 
+							Dusre haath se tere haath ko pakdega. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 5 weeks ago</span>
+                     
+                    </div>
+                </div>
+          
+<!-- Sample Shayari 6 -->
+                <div class="shayari-card rounded-xl p-6 mood-sad">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Mat Puch</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-rocket mr-1"></i> Sad</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Kya kya mohobat me mene gavaya mat puch, <br>
+							Usko kis kis se mene bachaya mat puch, <br>
+							Jo mujhse aaj wafao ka silha mang raha he, <br>
+							Uske khatir dushmano ko bhi manaya mat puch, <br>
+							Sidhe dil ko nishana nahi banaya usne, <br>
+							Pehele is dil ko dil banaya usne, <br>
+							Usko malum tha me mohobat ke naam pe kuch bhi kar sakta hu, <br>
+							Isliye to apne hatho se jeher khilaya usne. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 6 weeks ago</span>
+                       
+                    </div>
+                </div>
+        
+<!-- Sample Shayari 7 -->
+                <div class="shayari-card rounded-xl p-6 mood-romantic">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Dil lagayega</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i>Sad</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Vo din kis din ke baad me  aayega, <br>
+							Jis din ke baad tu kisi ke baat me nahi aayega, <br>
+							Me raaton me jagta hu aur masla ye he  ki, <br>
+							Mera mehboob masoom hai raat ko ghar se bahar nahi aayega, <br>
+							Dil me uski tasvir khil se gadi he, <br>
+							Tasveer nikal jayegi nishan nahi jayega, <br>
+							Aur rakh bachti he jalne ke baad me, <br>
+							Kon pagl he jo rakh se dil lagayega. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 7 weeks ago</span>
+                        
+                    </div>
+                </div>
+         
+<!-- Sample Shayari 8 -->
+                <div class="shayari-card rounded-xl p-6 mood-sad">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Nahi Kehete</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-heart mr-1"></i>Spiritual</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Sar jispe na jhuk Jaye use dar nahi kehete, <br>
+							Har dar pe jo jhuk Jaye use sar nahi kehete, <br>
+							Kya tujhko jaha Wale sitam gar nahi kehete, <br>
+							Kehete to hai magar tere muh par nahi kehete.<br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 8 weeks ago</span>
+                        
+                    </div>
+                </div>
+            
+<!-- Sample Shayari 9 -->
+                <div class="shayari-card rounded-xl p-6 mood-inspirational">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Nhi Karte </h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-rocket mr-1"></i> Sad</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Tumse ishq nahi hota to karna jaruri to nahi, <br>
+							Kisiko bich rah me chodna majburi nahi, <br>
+							Khelne ke liye khilone hote he, <br> 
+							Kisike dil ko toda naho karte, <br>
+							Aur pyaar ek hi shaksh se hota hr har kisi se thoda thoda nahi karte. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 9 weeks ago</span>
+                        
+                    </div>
+                </div>
+           
+<!-- Sample Shayari 10 -->
+                <div class="shayari-card rounded-xl p-6 mood-inspirational">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Mera nhi</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i> Motivational </span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Ki dafan kardo ishq ki kahani se har vo kissa, <br>
+							Jisse padhkar koi bewafa kahe usse ,<br>
+							Vo humare mohobat thi jaha jiske sath bhi hai, <br>
+							Dua he rab khush rakhe usse, <br>
+							Apne mehenoob ko badnam kare humara kirdar itna badchalan nahi, <br>
+							Hum kal bhi uske ashiq the aaj bhi uske aashiq he apne iiman se dagmagaye nahi, <br> 
+							Khushnasibi ki mere yaar puchte he aaj bhi haal mera uske naam se, <br>
+							Badnashibi me kal bhi uska tha aur vo aaj bhi mera nahi . <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 10 weeks ago</span>
+                        
+                    </div>
+                </div>
+            
+			
+<!-- Sample Shayari 11 -->
+                <div class="shayari-card rounded-xl p-6 mood-romantic">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Mang Legi</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-heart mr-1"></i> Sad</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Jab kabhi vo meri yaado la calender tang legi, <br>
+							Tab tab ishq ke kuwein mein vo chalang legi, <br>
+							Tum aana har jagah bas mere ghar mt aata, <br>
+							Meri maa tumse apna beta mang legi. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 11 weeks ago</span>
+                       
+                    </div>
+                </div>
+            
+<!-- Sample Shayari 12 -->
+                <div class="shayari-card rounded-xl p-6 mood-sad">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Ke liye </h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-rocket mr-1"></i> Romantic </span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Chahiye mujhe jindagi tere sath gujarne ke liye, <br> 
+							Ek jindagi tujhse izzhar karne ke liye, <br> 
+							Tu ha kahe to ek tere pass gujarne ke liye, <br>
+							Ek jindagi bhi to  lag jayegi tujhe manane ke liye. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 12 weeks ago</span>
+                        
+                    </div>
+                </div>	
+			
+<!-- Sample Shayari 13 -->
+                <div class="shayari-card rounded-xl p-6 mood-romantic">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold"> Deta hu me </h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i> Sad</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Iskh ke mukam par apna hak ada kar deta hu me, <br>
+							Tujhse bichad kar khud ko sirf dard deta hu me, <br>
+							Aur mere pyaar ka kya silha du tujhe, <br>
+							Tum se dur hone se pal pal khud ko maar deta hu me. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 13 weeks ago</span>
+                        
+                    </div>
+                </div>
+            
+<!-- Sample Shayari 14 -->
+                <div class="shayari-card rounded-xl p-6 mood-spiritual">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Bulaya Jaye </h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i> Inspiring</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Mera bhi iskh ka mukadma ladhaya jaye, <br>
+							Mujhse mere pyaar ka silha pucha jaye, <br>
+							Mere liye vo  kitni  jaruri he, <br>
+							Ye batane ke liye gavah asman se bulaya jaye. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 14 weeks ago</span>
+                        
+                    </div>
+                </div>
+			
+<!-- Sample Shayari 15 -->
+                <div class="shayari-card rounded-xl p-6 mood-inspirational">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Liya Mene </h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i>Motivational</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Jo me ya tum samajle vo ishara kar liya mene, <br> 
+							Bharosa bas tumhara tha tumhara kar liya mene, <br>
+							Leher he hosla he rab he himat he duvaye he, <br>
+							Kinara karne walo se kinara kar liya mene. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 15 weeks ago</span>
+                        
+                    </div>
+                </div>	
+			
+<!-- Sample Shayari 16 -->
+                <div class="shayari-card rounded-xl p-6 mood-sad">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Nikal Aaye </h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i> Inspiring</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Almari ko khola to khat kuch purane nikal aaye, <br>
+							Najane mere chehere pe kese dane nikal aaye, <br>
+							Aur mumkin he hame gaav bhi pehechan na paye, <br>
+							Kyuki bohot kam umar me hum kamane nikal aaye. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 16 weeks ago</span>
+                        
+                    </div>
+                </div>
+			
+<!-- Sample Shayari 17 -->
+                <div class="shayari-card rounded-xl p-6 mood-inspirational">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Maa ke Dulaare</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i> Sad</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Zindagi ne vehem tod diye sare ke saare, <br>
+							Aab is duniya me humare karib koi nahi pyaare, <br>
+							Kuch is tarah jindagi ki har chij me bas haare, <br>
+							Aur javani me hi mar gaye vo maa ke dulare. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 17 weeks ago</span>
+                        
+                    </div>
+                </div>	
+			
+<!-- Sample Shayari 18 -->
+                <div class="shayari-card rounded-xl p-6 mood-romantic">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Ho gaya hu me </h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i> Sad</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                           Marne ke baad yu jinda ho gaya hu me, <br>  
+						   Kis kisam ka darinda ho gaya hu me, <br> 
+						   Dhota rehta hu bas hatho ko, <br>
+						   Dil keh raha he ganda ho gaya hu me, <br>    
+						   Zindagi itni ulti chal rahi he dosto, <br>     
+						   Zab se chasma laga hai andhaa ho gaya hu me. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 18 weeks ago</span>
+                        
+                    </div>
+                </div>	
+			
+<!-- Sample Shayari 19 -->
+                <div class="shayari-card rounded-xl p-6 mood-funny">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Dil Saare</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i> Funny</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Jisne bhi dil diya rakhne ko use, <br>      
+							Vo kha gayi ladko ke dil saare, <br>							
+							Koi tarasta raha bas deedar ko, <br> 
+							kisko dikhaye gaye jism ke til saare, <br>    
+							Aab lado na koi mera bhi mukadma yaar, <br> 
+							Kaha mar gaye ye mohobat ke vakil saare, <br>
+							Aur kari thi kisi ne sacchi mohobat tumse, <br>  
+							Bhare the kisi ne saare bill tumhare. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 19 weeks ago</span>
+                        
+                    </div>
+                </div>		
+			
+<!-- Sample Shayari 20 -->
+                <div class="shayari-card rounded-xl p-6 mood-spiritual">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Tum na Mile</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i> Sad</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Itne hasin chehere mile par tum na mile, <br>
+							Tum se kai ache mile tum na mile, <br>
+							Vo chai,vo shan,vo halat tum se milne ke sabhi bahane mile, <br>
+							Par tum na mile. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 20 weeks ago</span>
+                        
+                    </div>
+                </div>		
+			
+			
+<!-- Sample Shayari 21 -->
+                <div class="shayari-card rounded-xl p-6 mood-inspirational">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">He Mera</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i>Reality </span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Koi kehta he yaar bohot pyaara he Mera, <br>
+							Koi kehta he ki nek irada he Mera, <br>
+							Kitna bhi kama lo akhir sab to yaha chhod kar Jana he, <br> 
+							Fir kyu kehete ho ye Tera vo mera. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 21 weeks ago</span>
+                        
+                    </div>
+                </div>		
+				
+<!-- Sample Shayari 22 -->
+                <div class="shayari-card rounded-xl p-6 mood-romantic">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Rehne do </h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i> Inspiring</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Kuch hunar he humme to unhe thode din hi sahi chupa rehne do, <br>
+							Kuch log hum se khafa he to unhe aab khafa hi  rehne do,  <br>
+							Aur aab nahi he kisike dil jitne ki khvaish, <br>
+							Jo log hum humse dafa he unko dafa rehne do. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 22 weeks ago</span>
+                        
+                    </div>
+                </div>		
+				
+<!-- Sample Shayari 23 -->
+                <div class="shayari-card rounded-xl p-6 mood-inspirational">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Karte ho </h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i> Happy</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+							Mukamal he jindagi jo ham jiya karte he, <br>
+							Apne har kam moj me Kiya karte he, <br>
+							Hamare liye sharab ki kuch ehmiyat to nahi magar, <br>
+							Khushnashib he vo chai Jo hum har sham Piya karte he.  <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 23 weeks ago</span>
+                        
+                    </div>
+                </div>		
+					
+<!-- Sample Shayari 24 -->
+                <div class="shayari-card rounded-xl p-6 mood-funny">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Nahi jaati</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i> Sad</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Dil to Dil he Dil ki bate samajme nahi aati, <br>
+							Kitna bhi bhulne ki koshish karu  dil se teri baat nahi jaati, <br>
+							Aur bohot ki he mene teri yaad se picha chudane ki koshish, <br>
+							Kya karu mere dil se tu bhulayi nahi jaati. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 24 weeks ago</span>
+                        
+                    </div>
+                </div>		
+					
+<!-- Sample Shayari 25 -->
+                <div class="shayari-card rounded-xl p-6 mood-sad">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Mar gaye</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i> Romantic</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Yu to ajab ye bhi nhi ki hum uski adao par mar gaye, <br>
+							Hum to musafir the jaani najane kyu raho per mar gaye, <br>
+							Iskh tumhare jism se hota to lakh milte tumse hasi, <br>
+							Hum to pagal the unki aakho par mar gaye. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 25 weeks ago</span>
+                        
+                    </div>
+                </div>		
+<!-- Sample Shayari 26 -->
+                <div class="shayari-card rounded-xl p-6 mood-funny">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Manjur tha </h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i>Motivational</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Mene tujhe khoya to mere ache ke liye vo khona bhi jaruri tha, <br>
+							Aur tumare marji se agar mujhe na Sona bhi manjur tha, <br>
+							Aur ye Dil aaj bhi teri Jane ka afsos manata, <br>
+							reheta he, <br>
+							To is dil ko tere liye rona bhi manjur tha.  <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 26 weeks ago</span>
+                        
+                    </div>
+                </div>		
+						
+			
+<!-- Sample Shayari 27 -->
+                <div class="shayari-card rounded-xl p-6 mood-romantic">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Karte He Hum</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i> Inspiring</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Dua apko kuch istraha mile ki sab ke yaado me raho tum, <br>
+							Khush rakhe aapko ye phariyad roj kiya karte he hum, <br>
+							Gum aapke zindagi me na aaye, <br>
+							isliye aapko har roj yaad kiya karte he hum.  <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 27 weeks ago</span>
+                        
+                    </div>
+                </div>		
+					
+<!-- Sample Shayari 28 -->
+                <div class="shayari-card rounded-xl p-6 mood-romantic">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Hota He </h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i>Reality </span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+							Har dhadkan ke piche ek raaj hota he, <br>
+							Har baat batane ka ek andaj hota he, <br>
+							Jat tak thokar na Lage bewafai ki, <br>
+							Har kisi ko apni mohobbat par naaj hota he. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 28 weeks ago</span>
+                        
+                    </div>
+                </div>		
+					
+<!-- Sample Shayari 29 -->
+                <div class="shayari-card rounded-xl p-6 mood-inspirational">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Deedar hota</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i> Sad</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Chhod diya hamne ye Dil lagana aur pyaar ka afsana, <br>
+							Nhi to  mujhe bhi kisika intazaar hota, <br>
+							Varna mujhe bhi aaj kisi se pyaar hota, <br>
+							Aur mujhe bhi kisi chehera ka roj deedar hota. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 29 weeks ago</span>
+                        
+                    </div>
+                </div>		
+					
+<!-- Sample Shayari 30 -->
+                <div class="shayari-card rounded-xl p-6 mood-spiritual">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Bekarar Tha </h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i> Sad</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Kyu karte ho hamse itni nafrat tumhe bhi to kabhi hamse pyaar tha, <br>
+							Tumhare  sath nibhane ka hamara bhi to ek karar tha, <br>
+							To kyu dur Gaye mujhse jab ki mujhe pane ke liye, <br>
+							tumhara bhi dil bekarar tha.  <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 30 weeks ago</span>
+                        
+                    </div>
+                </div>		
+				
+<!-- Sample Shayari 31 -->
+                <div class="shayari-card rounded-xl p-6 mood-funny">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Dekhti he  </h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i> Inspiring</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Hu me kitna betab dekhti he, <br>
+							Pani ki pyas talab dekhti he, <br>
+							Jo mujhe ek dafa bhi na dekhti, <br>
+							meri aakhe bas usi ke khvab dekhti he.  <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 31 weeks ago</span>
+                        
+                    </div>
+                </div>		
+			
+<!-- Sample Shayari 32 -->
+                <div class="shayari-card rounded-xl p-6 mood-sad">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Thani He </h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i> Motivational</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Kab tak ese rukta rahu mujhe bhi manjil Pani he, <br>
+							Aur har us shaks ko javab Dena he, <br>
+							jisne mujhe harane ki Thani he.  <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 32 weeks ago</span>
+                        
+                    </div>
+                </div>	
+			
+<!-- Sample Shayari 33 -->
+                <div class="shayari-card rounded-xl p-6 mood-romantic">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Dost De Diya  </h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i> Inspiring</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Kuch khubsurat pal gujare gai aapke sath, <br>
+							to jindagi jine ka ek ehsas mil gaya, <br>
+							Bhagwan se ek ajnabi manga tha, <br>
+							Usne mujhe tere jesha dost de diya.  <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 33 weeks ago</span>
+                        
+                    </div>
+                </div>		
+			
+<!-- Sample Shayari 34 -->
+                <div class="shayari-card rounded-xl p-6 mood-romantic">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Yaad Kiya Jaata He </h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i> Happy</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Kisiko paiso ke Dam se yaad kiya jata he, <br>
+							Kisiko kam se  yaad kiya jata he, <br>
+							Aapka Kam karne ka tarika har kisi ko pasand he, <br>
+							Isliye apko har din har vakt yaad kiya jata he.  <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 34 weeks ago</span>
+                        
+                    </div>
+                </div>			
+			
+<!-- Sample Shayari 35 -->
+                <div class="shayari-card rounded-xl p-6 mood-inspirational">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Jata he  </h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i> Romantic </span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+							Adaye katilana he tumhari, <br>
+							Aur kisko kese ghayal Kiya ja sakta he sab jante he, <br> 
+							Is tir se koi chut nhi sakta aasani se, <br>
+							Isliye to hum aapke katilana akho se maar diya jata he. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 35 weeks ago</span>
+                        
+                    </div>
+                </div>	
+				
+<!-- Sample Shayari 36 -->
+                <div class="shayari-card rounded-xl p-6 mood-spiritual">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold"> Kiya Karte the </h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i> Romantic </span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Unka hasna bhi bhot lajavab tha, <br>
+							vo rote hue bhi bade pyare lagte the,   <br>
+							Aur mar jane ko ji karta tha janab, <br>
+							Jab vo  hamari taraf dekhkar isare Kiya karte the. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 36 weeks ago</span>
+                        
+                    </div>
+                </div>				
+			
+<!-- Sample Shayari 37 -->
+                <div class="shayari-card rounded-xl p-6 mood-sad">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold"> Bethe the </h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i> Reality </span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Kya milta he janab iskh karke akhir,  <br>
+							Dhokhe ke tofe Dene ko  tayar rehte he, <br>
+							Hajaro lut gaye, <br>
+							Iskh me phir bhi lakho tyar bethe he. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 37 weeks ago</span>
+                        
+                    </div>
+                </div>						
+			
+<!-- Sample Shayari 38 -->
+                <div class="shayari-card rounded-xl p-6 mood-romantic">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold"> Puchte he  </h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i> Inspiring</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Mujhse meri umar ka khasara puchte he, <br>
+							Yaani log mujhse tumhara puchte he,   <br>
+							Me batata hu unse meri talukat nhi rahe, <br>
+							Unhe yakin nahi aata fir vo dubara puchte he. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 38 weeks ago</span>
+                        
+                    </div>
+                </div>	
+				
+<!-- Sample Shayari 39 -->
+                <div class="shayari-card rounded-xl p-6 mood-inspirational">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Nhi he </h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i> Sad</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Dard aab itna ki sambhalta nahi he, <br>
+							Tera dil mere dil se milta nhi he, <br>
+							Aab aur kis tarah pukaroon main tumhe, <br>
+							Tera dil to mere dil ki sunta bhi nahi he. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 39 weeks ago</span>
+                        
+                    </div>
+                </div>	
+				
+<!-- Sample Shayari 40 -->
+                <div class="shayari-card rounded-xl p-6 mood-inspirational">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Gulaab Mile</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i> Romantic</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Duniya me gum behisaab mile, <br>
+							Bejaan se kitne khawab mile, <br>
+							Ghar mila bhi baharon ka chakam, <br>
+							Toh kaantose lipte gulaab mile. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 40 weeks ago</span>
+                        
+                    </div>
+                </div>	
+				
+<!-- Sample Shayari 41 -->
+                <div class="shayari-card rounded-xl p-6 mood-spiritual">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Kar Di</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i> Romantic</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Aab ye bhi pata sahil par humne sham kar di, <br>
+							Apna dil aur duniya aapke naam kar di, <br>
+							Ye bhi na socha kaise gujaregi jindagi, <br>
+							Bina soche samjhe har khushi tere naam kar di. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 41 weeks ago</span>
+                        
+                    </div>
+                </div>		
+<!-- Sample Shayari 42 -->
+
+                <div class="shayari-card rounded-xl p-6 mood-romantic">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Pighalte Rahenge </h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i> Romantic</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                           Dil me chahat ke diye jalte rahenge, <br>
+							Aakho se is tarah moti nikalte rahenge, <br>
+							Tum shamaa ban kar dil me roshni jagana, <br>
+							Hum aap ke liye moom tarah pighalte rahenge. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 42 weeks ago</span>
+                        
+                    </div>
+                </div>		
+<!-- Sample Shayari 43 -->
+
+                <div class="shayari-card rounded-xl p-6 mood-funny">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Majboor Kardo</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i> Inspiring</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                           Hume rooh se lagakar, <br>
+							humari takalife dur kar do, <br>
+							Hum sirf aapke ho jaye, <br>
+							Humko bas itna majboor kardo.  <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 43 weeks ago</span>
+                        
+                    </div>
+                </div>		
+<!-- Sample Shayari 44 -->
+
+                <div class="shayari-card rounded-xl p-6 mood-inspirational">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Umar Ho Na Ho</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i> Future Predict</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                           Wo baat kya kare jiski koi khabar na ho, <br>
+							Wo dua kya kare jiski koi asar na ho, <br>
+							Kaise kah de ki lag jaye humari umar aapko, <br>
+							Kya pata agle hi pal humari umar ho na ho. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 44 weeks ago</span>					  
+                    </div>
+                </div>		
+
+<!-- Sample Shayari 45 -->
+                <div class="shayari-card rounded-xl p-6 mood-sad">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Mila he</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i> Happy</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Bhavandar se nikal kar kinara mila he, <br>
+							Jeene ka fir ek sahara mila he, <br>
+							Bahut taklifo mai thi jindagi, <br>
+							Us jindagi me aab sath tumhara mila he. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 45 weeks ago</span>
+                        
+                    </div>
+                </div>		
+
+<!-- Sample Shayari 46 -->
+                <div class="shayari-card rounded-xl p-6 mood-spiritual">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Daawa Karte he</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i> Reality</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Rasmo Riwaaz ki jo perwaah karte he, <br>
+							Pyaar mai voh log gunaah karte he, <br>
+							Ishq vo junnon he jism deewane, <br>
+							Khud ko bheetar hone ka daawa karte he.<br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 46 weeks ago</span>
+                        
+                    </div>
+                </div>		
+
+<!-- Sample Shayari 47 -->
+                <div class="shayari-card rounded-xl p-6 mood-romantic">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Dil Lagane Ki</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i> Sad</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Meri ek hasarat thi tujhe paane ki, <br>
+							Fir pakar na kabhi dur jaane ki, <br>
+							Aab thak gaya hu tujhe manate manate, <br>
+							Bahut badi sajja mili he dil lagane ki. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 47 weeks ago</span>
+                        
+                    </div>
+                </div>		
+
+<!-- Sample Shayari 48 -->
+                <div class="shayari-card rounded-xl p-6 mood-inspirational">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Bekaar Na karna</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i>Expectation</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Meri dil sarhad paar na kare, <br>
+							Kajuk he dil dil ese var na karna, <br>
+							Khud se badkar bharosa he mujhe tum par, <br>
+							Is bharose ko tum bekaar na karna. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 48 weeks ago</span>
+                        
+                    </div>
+                </div>	
+<!-- Sample Shayari 49 -->
+                <div class="shayari-card rounded-xl p-6 mood-inspirational">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Mere Paas Hoti </h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i>Expectation</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Kash me paani hota aur tum pyaas hoti, <br>
+							Na mai khafa hoti na tum udaas hoti, <br>
+							Jab bhi tum meri nighahoon se door hoti, <br>
+							Mai tumhara naam leta aur tum mere paas hoti. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 49 weeks ago</span>
+                    </div>
+                </div>		
+
+<!-- Sample Shayari 50 -->
+                <div class="shayari-card rounded-xl p-6 mood-sad">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Rakhta He</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i>Reality</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Mujhse dur hokar paas na aane ka sahara rakhta he, <br>        
+							Wo shaksh apne sath sara jamana rakhta he, <br>
+							<br>
+							Me uski hi baato me khoya rahta hu, <br>
+							Wo mujhe apni baato se begana rakhta he, <br>
+							<br>
+							Me kayi saalo se beghar hu,<br>
+							Mere dil me vo shaksh apna thikana rakhta he, <br>
+							<br>
+							Me jab bhi usse milne ki baat karu, <br>
+							Vo har baar ere samne naya bahana rakhta he. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 50 weeks ago</span>
+                        
+                    </div>
+                </div>		
+				
+<!-- Sample Shayari 51 -->
+                <div class="shayari-card rounded-xl p-6 mood-funny">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Nhi Jaante</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i> Sad</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Jo chhod diya tujhe, <br>
+							Koi hisaab E-Ishq nhi mangte, <br>
+							Aab Shikwa nhi, <br>
+							Shikayat nhi, <br>
+							Ja hum tujhe aab aur nhi jaante. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 51 weeks ago</span>
+                        
+                    </div>
+                </div>		
+
+<!-- Sample Shayari 52 -->
+                <div class="shayari-card rounded-xl p-6 mood-romantic">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Nhi Jaante</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i> Sad</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                           Ay kash meri rahon me biite hue jamane aajaye, <br>
+							Me samne unke bethha hu mere dost purane aa jaye, <br>
+							chhod kar gaye tanha mujhko me geet unhi ke gata hu, <br>
+							Kisi roz wo meri rahoon me mera dil hi dukhhane aa jaye. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 52 weeks ago</span>
+                        
+                    </div>
+                </div>	
+
+<!-- Sample Shayari 53 -->
+                <div class="shayari-card rounded-xl p-6 mood-inspirational">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Dekhi he</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i>Reality</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                           Ek pal me mene sadiya dekhi he, <br>
+							Ek ladki me mene duniya dekhi he, <br>
+							Ye vo nhi jo mujhe chhod kar gayi, <br>
+							Ye vo he jisne meri kamiya dekhi he. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> Day 1,1year ago</span>
+                        
+                    </div>
+                </div>	
+
+
+<!-- Sample Shayari 54 -->
+                <div class="shayari-card rounded-xl p-6 mood-spiritual">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Jinda hu</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i>inspiration</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                           Kisi ko dekh kar me jinda hu, <br>
+							Kisiki duaao par me jinda hu, <br>
+							Teri bewafai mujhe kab ka maar deti jaani, <br>
+							Me to apne maa ke khatir jinda hu. <br>
+							
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> Day 2,1year ago</span>
+                    </div>
+                </div>	
+				
+<!-- Sample Shayari 55 -->
+                <div class="shayari-card rounded-xl p-6 mood-spiritual">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Tasviro ke</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i>Emotional</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                           Kya haal hote honge amhiro ke, <br>
+							Jab tol nahi paate honge maul hiroo ke, <br>
+							Abhi to hum bas ek baar mile he aur, <br>
+							Screenshot liye ja rahe he teri tasviro ke. <br>
+							
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> Day 3,1year ago</span>
+                        
+                    </div>
+                </div>	
+
+
+<!-- Sample Shayari 56 -->
+                <div class="shayari-card rounded-xl p-6 mood-funny">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Mar gaye hote</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i>Reality</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                           Ki daga dete hue ek pal rab se dar gaye hote, <br>
+							Wafa acha karam he kaash tum bhi kar gaye hote, <br>
+							Aur vo to me hu mere yaara jo hasta hu jamane me, <br>
+							Mujhe bakshi hui taklif me tum mar gaye hote. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> Day 4,1year ago</span>
+                        
+                    </div>
+                </div>	
+
+<!-- Sample Shayari 57 -->
+                <div class="shayari-card rounded-xl p-6 mood-romantic">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Lagaya Karta tha</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i>Sad</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                           Apne badan pr ghav banaya karta tha, <br>
+							Me bas uska haath bataya karta tha, <br>
+							Suni sadak pr gadi tej chalakar, <br>
+							Pedoo ki raftar badhaya karta tha, <br>
+							Kon ek din me kitne Aashiq marega, <br>
+							Ishq jeher se shart lagaya karta tha. <br>
+
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> Day 5,1year ago</span>
+                        
+                    </div>
+                </div>	
+
+
+<!-- Sample Shayari 58 -->
+                <div class="shayari-card rounded-xl p-6 mood-spiritual">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Maar Deti he</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i> Sad</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                           Udaasi chakti rehti he, <br>
+							Dukho ko dhar deti he, <br>
+							Mohobbat kuch nhi karti, <br>
+							Ye ladke maar deti he. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> Day 6,1year ago</span>
+                        
+                    </div>
+                </div>	
+
+<!-- Sample Shayari 59 -->
+                <div class="shayari-card rounded-xl p-6 mood-inspirational">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Makan Walo ne</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i>Reality</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                          Dil ki maramat ko gaya tha me, <br>
+							Dil khured diya zabaan walo ne, <br>
+							naya mangunga aab rab se, <br>
+							Bada mehenga kar diya dil dukan walo ne, <br>
+							Aur meri taraf jitni bhi mohobbat ki patang aayi, <br>
+							Sabko lut liya uche makan walo ne. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> Day 7,1year ago</span>
+                        
+                    </div>
+                </div>	
+
+<!-- Sample Shayari 60 -->
+                <div class="shayari-card rounded-xl p-6 mood-spiritual">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Nikal lete he</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i>Funny</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+							Ke neem ke pedh se phal nikal lete he, <br>
+							Hum har masale ka hal nikal lete he, <br>
+							Itna bhar gaya he mann ke kya bataye, <br>
+							Ishq dikhte hi chappal nikal lete he. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> Day 8,1year ago</span>
+                        
+                    </div>
+                </div>	
+
+<!-- Sample Shayari 61 -->
+                <div class="shayari-card rounded-xl p-6 mood-romantic">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Dikhaya Nhi Mene</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i>Realize</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            Tum saath bankar chalna me umr bankar chalunga, <br>
+							Me jugnu si sohobat ka hu, <br>
+							Andhere me bhi chamkunga, <br>
+							Aab itna keemti to jindagi me kisi ko banaya nhi mene, <br>
+							Ek sheer he jo kisiko sunaya nhi mene, <br>
+							Ek ghav he jo kisiko dikhaya nhi mene. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> Day 9,1year ago</span>
+                        
+                    </div>
+                </div>	
+
+<!-- Sample Shayari 62 -->
+                <div class="shayari-card rounded-xl p-6 mood-sad">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Batana Bhul Gaye</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i>Sacrifice</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+							Teri yaad me hum jamana bhul gaye, <br>
+							Kisi aur ko hum apanana bhul gaye, <br>
+							Tujhse mohobbat he mujhe mene bataya saare jaaha ko, <br>
+							Bas galti itni hui ki tujhe batana bhul gaye. <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> Day 10,1year ago</span>
+                        
+                    </div>
+                </div>	
+
+<!-- Sample Shayari 63 -->
+                <div class="shayari-card rounded-xl p-6 mood-inspirational">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Thoda Thoda Nhi Karte</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i>Inspiring</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+							Ke tumse ishq nhi hota to karna jaruri nhi, <br>
+							Kisiko bich raah me chhod na majboori Nhi, <br>
+							Aur Khelne ke liye khilone hote he, <br>
+							Kisi ke maasum dil ko tooda nhi karte, <br>
+							Pyaar kisi ek shaksh se hota he har kisi se thoda thoda nhi karte.  <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> Day 11,1year ago</span>
+                        
+                    </div>
+                </div>	
+
+          </div>
+        </div>
+    </section>
+   
+   <!-- My Poetry Section -->
+     <section id="my-Poetry" class="my-shayaris py-20">
+        <div class="container mx-auto px-6">
+            <h2 class="heading-font text-4xl font-bold mb-4 text-center">
+                <i class="fas fa-book-reader mr-2"></i>My Poetry Collection
+            </h2>
+            <p class="text-xl text-center mb-12 max-w-3xl mx-auto">
+                All your beautiful creations in one place, ready to be revisited or shared
+            </p>
+            
+      
+<!-- Shayaris Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              
+			  <!-- Sample Kavita 1 -->
+                <div class="shayari-card rounded-xl p-6 mood-romantic">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">नको होते</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-heart mr-1"></i> Romantic</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg bold">
+                        <p>
+                            हा दुरावा की दरी माझ्या तुझ्या मध्ये <br>
+							ही कुणाची सावली माझ्या तुझ्या मध्ये <br>
+							ही नव्हे अडचन प्रिये ही तर खरी संधी <br>
+							रात्र जी आहे उभी माझ्या तुझ्या मध्ये<br>
+							ही कुणाची सावली माझ्या तुझ्या मध्ये <br>
+							पूर्ण करणारी हवी सौंसार दोघांचा <br>
+							एक छोटी बाहुली माझ्या तुझ्या मध्ये <br>
+							<br>
+							पुन्हा तोच सागर पुन्हा त्याच लाटा पुन्हा तिच खडखड नको वाटते <br>
+							पुन्हा तेच अंतर पुन्हा त्याच लाटा पुन्हा तिच वरदळ नको वाटते <br> 
+							पुन्हा तोच सागर पुन्हा त्याच लाटा पुन्हा तिच खडखड नको वाटते  <br>
+							<br>
+							बिलगणे नको घट्ट इत्के कुणाला नको सय्यमी खांब ढासाळने <br>
+							पुन्हा तोच वारा पुन्हा तोच पाऊस पुन्हा तेच वादळ नको वाटते <br>
+							पुन्हा तोच सागर पुन्हा त्याच लाटा पुन्हा तिच खडखड नको वाटते <br>
+							नको वाटते हे घसरणे बिसर्णे कशातच नको वाटते गुंतने <br>
+							पुन्हा तिच उष्म पुन्हा ते ईशारे पुन्हा लागवी झड नको वाटते <br>
+							पुन्हा तोच सागर पुन्हा त्याच लाटा पुन्हा तिच खडखड नको वाटते <br>
+							चालले जे का....ही व्याला नको होते <br>
+							मैफिलीत तू माझ्या यायला नको होते <br>
+							<br>
+							मी विचार परिणामी फारसा न केलेला <br>
+							एवढा दिमाखाने गायला नको होते <br>
+							ठेवली उधारी वर जिंदगीच मी माझी <br>
+							स्वास ओंजडी मद्धे द्यायला नको होते  <br>
+							मैफिलत  तू माझ्या यायला नको होते  <br>
+							<br>
+							कोणती दवा घेऊ हे व्यसन कसे सोडु <br>
+							चांदने सुन्या रात्री प्यायला नको होते  <br>
+							मैफिलीत तू माझ्या यायला नको होते <br>
+							<br>
+							एव्हढे जवळ आपणं का कधी कसे आलो <br>
+							हात त्याकशनी हाती घायला नको होते <br>
+							मैफिलीत तू माझ्या यायला नको होते <br>
+							<br>
+							एकता बारा होता <br>
+							एकता जगत होता <br>
+							वेळ मानसांचे हे  चा..यला नको होते <br>
+
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 1 days ago</span>
+                        
+                    </div>
+                </div>
+                
+<!-- Sample Kavita 2 -->
+                <div class="shayari-card rounded-xl p-6 mood-sad">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">काही नाही</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-sad-tear mr-1"></i> Romantic</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg bold">
+                        <p>
+                            नातं म्हणजे नुस्ती वनवन बाकी काही नाही <br>
+							भडभडत्या जख्मांचे कोंडण बाकी काही नाही <br>
+							शब्द, कल्पना, यमक वगेरे साधन अस्ते केवळ  <br>
+							कविता म्हंजे तुझी आठवन बाकी काही नाही  <br>
+							<br>
+							जन्मा पासुन माझा वरती दुखाची या नजर वगेरे <br>
+							तुझा मुळे जगन्यात उतरली आनंदाची लहर वगेरे <br>
+							<br>
+							अन ओठांवरती तिळ तिचा ते दैवाने सुंदर दान दिले <br>
+							म्हणून बहुदा तिला कोणाची लगत नाही नजर वगेरे <br>
+							आणि तिचे बोलणे तिचे लाजणे इतका इतका कहर बरसतो <br>
+							पुढे तिचा तर फिकी पडते मोदीजींची लहर वगेरे <br>
+							आणि जगणे म्हंजे जन्म मृत्यु च प्रवास आहे रटाळवना <br>
+							तू अस्ली तर सोपी होइल आयुष्याची सफर वगेरे <br>
+							<br>
+							याचे त्येचे प्रतिकाचे खोटे वाटात गेले <br>
+							दु:ख आपले प्रतेकला मोठे वाटात गेले  <br>
+							आणि हौसेने काही नाट्यांचा भार घेतला होता  <br>
+							नंतर नंतर त्या नाट्यांचे ओझे  वाटात गेले <br>
+							<br>
+							गुलाब चाफा अतार बितर तुझा पुढे तर काहीच नाही <br>
+							झाडे वेलि हिरवड डोंगर तुझा पुढे तर काहीच नाही <br>
+							अन थंडी इटकी वाढत आहे उपाय त्यावर काय करावा <br>
+							शाल पांघरुण स्वेटर चादर तुझा पुढे तर काहीच नाही <br>
+							<br>
+							जसा गोडवा तुझ्यात आहे तसा गोडवा  कुणात नाही <br>
+							ऊस गुड वाटीभर साखर तुझा पुढे तर काहीच नाही <br>
+							आणि तुझी बाब नर्जेतुन मिलते हव्या कशाला शित्य ताड्या <br>
+							वाह वाह क्या बात हे मुकरार तुझा पुढे तर काहीच नाही <br>
+							<br>
+							तुझे चुकुन डोले दबदबले असे वाटले होते तेव्हा <br>
+							गंगा यमुना अथांग सागर तुझा पुढे ते कहीच नाही <br>
+							<br>
+							कविता गजला लिहू तुझावर  की एखादी ओळ लिहू <br>
+							झालो मी काहीही सादर तुझा पुढे तर काही नाही <br>
+
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 2 week ago</span>
+                    </div>
+                </div>
+                
+<!-- Sample Kavita 3 -->
+                <div class="shayari-card rounded-xl p-6 mood-inspirational">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">लोचा झाला</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-rocket mr-1"></i> Inspiring</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+								केव्हा ना केव्हा होनारच होता झाला <br>
+								या माझा दोळ्यांना पण धोका झाला <br>
+								प्रेम निरागस होते माझे शाळेमधले मधले <br>
+								College  मधे गेला नंतर लोचा झाला <br>
+								<br>
+								सोता कडूं सोताला झालेल्या जख्मा <br>
+								शेर रुबाई गजला कविता सार्या जखामा <br>
+								<br>
+								मी माझ्या मरनाचा उत्सव केला असता <br>
+								जर छाती वरती झाल्या असत्या पाठीवरच्या  जख्मा <br>
+								मी म्हटलो प्रेमात तुम्हाला काय मिळाले  <br>
+								लोका म्हणाले नुस्त्या जख्मा नुस्त्या जख्मा <br>
+								<br>
+								इतकी कसली बरकत आहे घरात माझ्या <br>
+								दुःख सुखें नांदत अहे घरात माझ्या <br>
+								तू त्याला रुदयात लपाऊन आली ना <br>
+								ये दोघांचे ही स्वागत आहे घरत माझ्या  <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 3 weeks ago</span>
+                    </div>
+                </div>
+            
+<!-- Sample Kavita 4 -->
+                <div class="shayari-card rounded-xl p-6 mood-spiritual">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">नाही कुणाला</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-rocket mr-1"></i>Romantic </span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+                            
+							होईल प्रेम इत्के पाहु नाही कुणाला <br>
+							जाईल जीव इतका लाऊ नाही कुणाला <br>
+							प्रेमात वेक्त झालो घेउन एक धास्ती <br>
+							बोलेण पण तिने ते सांगू नाही कुणाला <br>
+							<br>
+							छढते पुढे दिवसभर अर्द्यात स्वप्न तुटणे <br>
+							झोपेतुन पाहटे पाहटे उठौउ नाही कुणाला  <br>
+							<br>
+							तो चेहेरा बदलला तेव्हा मला समजले <br>
+							पाहुन चेहेरा मन देउ नाही कुणाला <br>
+							आला असा अनुभव रडवुन तीच गेली <br>
+							मजला म्हनायची जी रडवु नाही कुणाला <br>
+							<br>
+							मी तर कुठे म्हणालो पाहु नको मला तू <br>
+							पण घे काळजी अशी की समजू नाही कुणाला <br>
+							नादात ज्या खुळ्या मी बरबाद होत आहे  <br>
+							तो नाद माझिया नंतर लागु नाही कुणाला <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 4 weeks ago</span>
+                    </div>
+                </div>
+              
+<!-- Sample Kavita 5 -->
+                <div class="shayari-card rounded-xl p-6 mood-inspirational">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">तर...  </h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-rocket mr-1"></i>Funny </span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg italic">
+                        <p>
+							तिने माझा नेम पकडला तर ... <br>
+							तितक्यातच बाण निसटला तर... <br>
+							<br>
+							डोल्यांशी करशी रिती <br>
+							पण अश्रुनीच पक्ष बदलला तर ... <br>
+							<br>
+							हात पकडला तर राग किती <br>
+							मी जर राग पकडला तर ... <br>
+							<br>
+							आणि  द्रुष्टी साठी लाऊ चष्मे <br>
+							द्रुष्टिकोन बिघडला तर ... <br>
+							<br>
+							प्रेम  तुझे ते आहे जीव घेने <br>
+							जीव तुझाच  अडकला तर ... <br>
+							<br>
+							अंधारावर प्रेम करू मी <br>
+							तितक्यात सूर्य उगवला तर ... <br>
+							<br>
+							नंबर आहे पाठ तिचा <br>
+							पण तिच्या नवर्याने फोन उचलला तर ... <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 5 weeks ago</span>
+                    </div>
+                </div>
+	
+<!-- Sample Kavita 6 -->
+                <div class="shayari-card rounded-xl p-6 mood-romantic">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">नाही वाटतं </h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-rocket mr-1"></i> Inspiring</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg bold">
+                        <p>
+							एक अनोळखी ताई काल स्वप्नात आली <br>
+							आणि तक्रार देवा तिने तुझी माझा कडे केली <br>
+							म्हणे दे ना दादा थोडा लढायला आधार <br>
+							किती तरी बहिणींचा इथं अंधारी सवसार  <br>
+							सगळं काही बघुन सुध्दा तुला दिसत नाही वाटतं <br>
+							आणि पैसा शिवाय डोकं देवा चालत नाही वाटतं  <br>
+							<br>
+							खुर्ची साठी बघ ना देवा लाचरांची दरी <br>
+							लोकां मध्ये वेगळे आणि एका ताटात घरी <br> 
+							अरे वाटुन घेटला इथं त्यांनी  हिरवा,भगवा, निळा <br>
+							मानसानिच कापला कसा मानसाचा गळा <br>
+							अरे पुसून चाल्ला तिरंगा पण तुला दिसत नाही वाटतं  <br>
+							आणि पैसा शिवाय डोकं देवा चालत नाही वाटतं <br>
+							<br>
+							प्रेमा मधे बघ ना आता कसं जाळं पडलं <br>
+							हो म्हटली पोरगी नंतर सगळं उलटा घडलं  <br>
+							तिला सुधा कळत नाही मरायचा कसा <br>
+							लग्ना आधीच पोटुशी मग जगायचा कसा <br>
+							अरे शिवरायांचे शासन तुला महित नाही वाटतं  <br>
+							आणि पैसा शिवाय डोकं देवा चालत नाही वाटतं <br>
+							<br>
+							अरे आई बहीन असुन सुद्धा नजर शेन खाते <br>
+							बहिन सोडुन जेव्हा दुसरी पोरगी  पुढे येते  <br>
+							अरे तुझा डोळ्या सामोर होतं देवा हात्या कांड <br>
+							वडू सारखा फिरत राहतो खुनी खुळा सांड <br>
+							त्यला कसा मारायचा तुला कडत नाही वाटतं <br>
+							आणि पैसा शिवाय डोकं देवा चालत नाही वाटतं <br>
+							<br>
+							अन  बळीराजा बघ ना देवा झाडा वरती गेला <br>
+							औषध पिला कधी तर कधी विहिरी मध्ये मेला <br>
+							उन्हाळ्यात हमी भाव व्यापाऱ्याला देतो <br>
+							आणि पानतळ्यात  नेता फक्त मतां  साठी येतो <br>
+							कुंकू पुसलं, बांगडी फुटली, नवरा मेला वाटातं <br>
+							आणि पैसा शिवाय डोकं देवा चालत नाही वाटतं <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 7 weeks ago</span> 
+                    </div>
+                </div>
+		   
+<!-- Sample Kavita 8 -->
+                <div class="shayari-card rounded-xl p-6 mood-romantic">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">वास्तविक स्थिती</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-rocket mr-1"></i> Inspiring</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg bold">
+                        <p>
+							For boys :-
+								का नाही बघत तू सर्वांकडे तुझ्या बहिनी सारखं <br>
+								का म्हणतोस तुझी बहिण तुझी आणि का समाजतोस बाकीचा परकं <br>
+								राहत अशिल सोताचा बहिणी साठी वाघा सारखा मित्रा  <br>
+								तर कशाला व्हायचा अस्त तुला दुसर्यांन साठी कुत्रा <br>
+								<br>
+								वाटू दे थोडी शी लाज की नजर आपली पण घान आहे <br>
+								आणि कशी म्हणेल रे तुझी बहिण की मला तुझा वर अभिमान आहे <br>
+								आपन जगाचा गोष्टी करतो आपले विचार तर आहे का रे वेगळे <br>
+								आधी कोनी नस्त समजवायला पण नंतर अस्तात मात्र सगळे <br>
+								<br>
+							For girls :-
+								<br>
+								आई बापाचा मनात भीती अस्ते सतत <br>
+								तुम्ही पण सांभाळून रहावा असे तुम्हाला नाही का वाटत  <br>
+								अरे त्यांचा मनात ते भीती प्रत्येक काठ गाठते <br>
+								जेव्हा त्याना कडतं की त्यांची मुलगी कोनाला तरी भेटते  <br>
+								<br>
+								जेव्हा रागावतो तुम्हाला तुमचा भाऊ तेव्हा तुम्हाला राग येतो <br>
+								त्याचं नाही ऐकलं तर मग जग तुमचा फयदा घेतो<br>
+								<br>
+								आता बाकीचा सर्व निर्णय तुमचा पायाशी ठेवतो <br>
+								आणि जिथे जाणार तिथे सांभाळून राहा आशी विनंती करतो <br>
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 8 weeks ago</span>
+                    </div>
+                </div>
+		   
+<!-- Sample Kavita 9 -->
+                <div class="shayari-card rounded-xl p-6 mood-sad">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Ye Julfe na Khola Karo</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-rocket mr-1"></i> Romantic</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg bold">
+                        <p>
+                           Dhadkane ruk jayengi ek din  <br>    
+						   Sase bhi phir chalengi nhi <br>    
+						   Kar lo lakh sitam mujhpe jo aaye muh me bola karo   <br>
+						   Tum mere salamati chahte ho na yaar ye jhulfe mat khola karo  <br> 
+						   <br>
+						   Kyuki dekho fir kuch esa hoga ,me kuch istarah apni jindagi me bahar dunga   <br>    
+						   Teri jhulfo ko apke hatho se savar dunga <br>  
+						   <br>
+						   Aur chipa kar rakh lunga teri ek jhulf ko apni hath me <br>  
+						   Ja kar rakh dunga kisi panne  ya kisi kitab me    <br>    
+						   Phir ek arse baad jab vo kitab milegi isme kisi ki kahani he kahuga   <br>   
+						   Ye koi mamuli kitab nhi he isme kisiki javani he kahunga  <br> 
+						   <br>
+						   Phir kabhi budhape me jakar tumhe  ye kitab dunga  <br>       
+						   Apni jaan bolkar apni hone ka khitab dunga  <br>           
+						   Tum haskar bologi yaar ese mat bola karo <br>            
+						   Me fir vahi kahunga yaar ye julfe na khola karo <br>
+						  
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 9 weeks ago</span>   
+                    </div>
+                </div>
+              
+<!-- Sample Kavita 10 -->
+                <div class="shayari-card rounded-xl p-6 mood-inspirational">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="heading-font text-2xl font-bold">Ye dil</h3>
+                        <span class="text-sm bg-white bg-opacity-10 px-3 py-1 rounded-full"><i class="fas fa-rocket mr-1"></i> Romantic</span>
+                    </div>
+                    <div class="shayari-content mb-6 text-lg bold">
+                        <p>
+                            Tumhe dekhne ke liye bekarar he, <br>   
+								<center>  Dil   </center>    
+						    Teri ek nighahoon ka talabgaar he,  <br>
+								<center>  Dil   </center>    
+						       Issey har pal tera intezaar rehta he <br>
+						    Tumhe ek baar dekhne ko talabgaar he<br>    
+								<center>  Dil   </center>    
+						    Kissi se pyaar ki bhik nhi mangta<br>
+						    Iss mamley me khudaar he <br>  
+								<center>  Dil   </center>    
+						    Meri toh koi baat nahi manta <br>   
+						    Par teri har baat manta <br> 
+						    Socho kitna wafadar he ye <br>
+								<center>  Dil   </center>    
+						    Aisa na ho koi issey mujhse chura le  <br>       
+						    Isliye aab Raat din rehta khabardaar he ye  <br>           
+								<center>  Dil   </center>          
+                        </p>
+                    </div>
+                    <div class="flex justify-between items-center text-sm text-white text-opacity-70">
+                        <span><i class="far fa-calendar-alt mr-1"></i> 10 weeks ago</span>   
+                    </div>
+                </div>   
+		   
+		   
+		   </div>
+			<br>
+			<br>
+			<br>
+
+
+
+    <!-- About Us Section -->
+    <section id="about_us" class="pt-32 pb-20">
+        <div class="container mx-auto px-6 text-center">
+            <h1 class="heading-font text-5xl md:text-6xl font-bold mb-6">About Kalpanik Duniya </h1>
+            <p class="text-xl max-w-3xl mx-auto mb-10">
+                A digital haven for poets and wordsmiths to express their deepest emotions through verse
+            </p>
+        </div>
+    </section>
+
+    <!-- Creator Section -->
+    <section class="py-16">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto glass-effect rounded-2xl p-8 md:p-12">
+                <div class="text-center mb-12">
+                    <h2 class="heading-font text-3xl font-bold mb-4">Meet the Creator</h2>
+                    <div class="w-20 h-1 bg-gradient-to-r from-purple-600 to-purple-400 mx-auto"></div>
+                </div>
+                
+                <div class="flex flex-col md:flex-row items-center gap-8">
+                    <div class="md:w-1/3">
+                        <div class="relative mx-auto w-48 h-48">
+                            <div class="absolute inset-0 bg-gradient-to-r from-purple-600 to-purple-400 rounded-full transform rotate-45 floating"></div>
+                            <img src="https://placehold.co/200x200/1a1a2e/5f2c82/png?text=GRS" 
+                                 alt="Portrait of Gaurav Rajendra Sarode, creator of Poetry Sanctuary" 
+                                 class="relative z-10 w-full h-full object-cover rounded-full border-4 border-gray-900">
+                        </div>
+                    </div>
+                    
+                    <div class="md:w-2/3">
+                        <h3 class="heading-font text-2xl font-bold mb-4 obl"> Gaurav Rajendra Sarode</h3>
+                        <p class="mb-4">
+                            The visionary creator, developer, and maintainer of Poetry Sanctuary. With a passion for both technology 
+                            and literature, Gaurav conceptualized this platform to bridge the gap between traditional poetic expression 
+                            and modern digital experiences.
+                        </p>
+                        <p class="mb-4">
+                            As a full-stack developer with a deep appreciation for the arts, he has carefully crafted every aspect of 
+                            this website to ensure it provides an inspiring environment for poets and writers to share their work.
+                        </p>
+                        <div class="flex flex-wrap gap-3 mt-6">
+                            <a href="#" class="btn-primary px-4 py-2 rounded-full text-sm">
+                                <i class="fab fa-instagram mr-2"></i>Instagram
+                            </a>
+                           
+                            <a href="#" class="btn-primary px-4 py-2 rounded-full text-sm">
+                                <i class="fas fa-envelope mr-2"></i>Contact
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-12 text-right">
+                    <p class="signature">G.R.S</p>
+                    <p class="text-sm text-white text-opacity-70">Founder & Developer</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mission Section -->
+    <section class="py-16">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto">
+                <div class="text-center mb-12">
+                    <h2 class="heading-font text-3xl font-bold mb-4">Our Mission</h2>
+                    <div class="w-20 h-1 bg-gradient-to-r from-purple-600 to-purple-400 mx-auto"></div>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="glass-effect p-6 rounded-xl">
+                        <div class="text-4xl text-purple-400 mb-4">
+                            <i class="fas fa-feather-alt"></i>
+                        </div>
+                        <h3 class="heading-font text-xl font-bold mb-3">Preserve Poetry</h3>
+                        <p>Create a digital sanctuary where poets can preserve their most heartfelt creations for generations to come.</p>
+                    </div>
+                    
+                    <div class="glass-effect p-6 rounded-xl">
+                        <div class="text-4xl text-purple-400 mb-4">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h3 class="heading-font text-xl font-bold mb-3">Build Community</h3>
+                        <p>Foster a supportive community of writers who can share, inspire, and grow together through poetic expression.</p>
+                    </div>
+                    
+                    <div class="glass-effect p-6 rounded-xl">
+                        <div class="text-4xl text-purple-400 mb-4">
+                            <i class="fas fa-laptop-code"></i>
+                        </div>
+                        <h3 class="heading-font text-xl font-bold mb-3">Modern Experience</h3>
+                        <p>Combine the timeless art of poetry and shayari with modern technology to create an immersive user experience.</p>
+                    </div>
+                    
+                    <div class="glass-effect p-6 rounded-xl">
+                        <div class="text-4xl text-purple-400 mb-4">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <h3 class="heading-font text-xl font-bold mb-3">Passion Project</h3>
+                        <p>This website is maintained with love and dedication by G.R.S as a passion project.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Timeline Section -->
+    <section class="py-16">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto">
+                <div class="text-center mb-12">
+                    <h2 class="heading-font text-3xl font-bold mb-4">Development Journey</h2>
+                    <div class="w-20 h-1 bg-gradient-to-r from-purple-600 to-purple-400 mx-auto"></div>
+                </div>
+                
+                <div class="relative">
+                    <!-- Timeline line -->
+                    <div class="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gradient-to-b from-purple-600 to-purple-400"></div>
+                    
+                    <!-- Timeline items -->
+                    <div class="flex flex-col space-y-12">
+                        <!-- Item 1 -->
+                        <div class="flex items-center">
+                            <div class="w-1/2 pr-8 text-right">
+                                <h3 class="heading-font text-xl font-bold text-purple-300">Conceptualization</h3>
+                                <p class="text-sm text-white text-opacity-70">May 2025</p>
+                                <p>The idea for Poetry Sanctuary was born from a desire to create a beautiful digital space for poets.</p>
+                            </div>
+                            <div class="relative">
+                                <div class="w-6 h-6 bg-purple-600 rounded-full"></div>
+                            </div>
+                            <div class="w-1/2"></div>
+                        </div>
+                        
+                        <!-- Item 2 -->
+                        <div class="flex items-center">
+                            <div class="w-1/2"></div>
+                            <div class="relative">
+                                <div class="w-6 h-6 bg-purple-600 rounded-full"></div>
+                            </div>
+                            <div class="w-1/2 pl-8">
+                                <h3 class="heading-font text-xl font-bold text-purple-300">Development</h3>
+                                <p class="text-sm text-white text-opacity-70">June 2025</p>
+                                <p>Gaurav began developing the platform using modern web technologies with a focus on user experience.</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Item 3 -->
+                        <div class="flex items-center">
+                            <div class="w-1/2 pr-8 text-right">
+                                <h3 class="heading-font text-xl font-bold text-purple-300">Launch</h3>
+                                <p class="text-sm text-white text-opacity-70">July 2025</p>
+                                <p>Kalpanik Duniya  was officially launched, welcoming poets from around the world.</p>
+                            </div>
+                            <div class="relative">
+                                <div class="w-6 h-6 bg-purple-600 rounded-full"></div>
+                            </div>
+                            <div class="w-1/2"></div>
+                        </div>
+                        
+                        <!-- Item 4 -->
+                        <div class="flex items-center">
+                            <div class="w-1/2"></div>
+                            <div class="relative">
+                                <div class="w-6 h-6 bg-purple-600 rounded-full"></div>
+                            </div>
+                            <div class="w-1/2 pl-8">
+                                <h3 class="heading-font text-xl font-bold text-purple-300">Ongoing Maintenance</h3>
+                                <p class="text-sm text-white text-opacity-70">Present</p>
+                                <p>Continuously improved and maintained with regular updates and new features.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<footer class="bg-black bg-opacity-80 py-12 mt-20">
+        <div class="container mx-auto px-6">
+            <div class="text-center">
+                <div class="mb-6">
+                    <img src="C:\Users\gaura\Downloads\KD\web_log.jpg" width='70' height='30' alt="Kalpanik Duniya logo" class="mx-auto rounded-full mb-4"> <h3 class="heading-font text-2xl">Kalpanik Duniya </h3>
+                </div>
+                
+                <p class="text-white text-opacity-70 max-w-2xl mx-auto mb-6">
+                    A passion project created, developed, and maintained with ❤️ by 
+                    <span class="text-purple-400 font-medium">Gaurav Rajendra Sarode (GRS)</span>
+                </p>
+                
+                <div class="flex justify-center space-x-4 mb-6">
+                    <a href="#" class="text-white text-opacity-70 hover:text-purple-400 transition"><i class="fab fa-github"></i></a>
+                    <a href="#" class="text-white text-opacity-70 hover:text-purple-400 transition"><i class="fab fa-linkedin"></i></a>
+                    <a href="#" class="text-white text-opacity-70 hover:text-purple-400 transition"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-white text-opacity-70 hover:text-purple-400 transition"><i class="fas fa-envelope"></i></a>
+                </div>
+                
+                <p class="text-sm text-white text-opacity-50">
+                    © 2025 Kalpanik Duniya. All rights reserved. 
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <a href="#" id="back-to-top" class="fixed bottom-8 right-8 bg-gradient-to-r from-purple-600 to-purple-400 w-12 h-12 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all hidden">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+		
+			
+			
+
+    <!-- Footer -->
+    <footer class="bg-black bg-opacity-80 py-12">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-12">
+                <div>
+                    
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-white text-opacity-70 hover:text-opacity-100 transition" ><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-white text-opacity-70 hover:text-opacity-100 transition"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-white text-opacity-70 hover:text-opacity-100 transition"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-white text-opacity-70 hover:text-opacity-100 transition"><i class="fab fa-pinterest"></i></a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="heading-font text-xl font-bold mb-4">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-white text-opacity-70 hover:text-opacity-100 hover:text-purple-300 transition">Home</a></li>
+                        <li><a href="#my-shayaris" class="text-white text-opacity-70 hover:text-opacity-100 hover:text-purple-300 transition">My Poems</a></li>
+                        <li><a href="#add-shayari" class="text-white text-opacity-70 hover:text-opacity-100 hover:text-purple-300 transition">Add New</a></li>
+                        <li><a href="#" class="text-white text-opacity-70 hover:text-opacity-100 hover:text-purple-300 transition">Popular Poems</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="heading-font text-xl font-bold mb-4">Resources</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-white text-opacity-70 hover:text-opacity-100 hover:text-purple-300 transition">Poetry Tips</a></li>
+                        <li><a href="#" class="text-white text-opacity-70 hover:text-opacity-100 hover:text-purple-300 transition">Writing Prompts</a></li>
+                        <li><a href="#" class="text-white text-opacity-70 hover:text-opacity-100 hover:text-purple-300 transition">Poetic Forms</a></li>
+                        <li><a href="#" class="text-white text-opacity-70 hover:text-opacity-100 hover:text-purple-300 transition">Word Bank</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="heading-font text-xl font-bold mb-4">Stay Inspired</h3>
+                    <p class="text-white text-opacity-70 mb-4">
+                        Subscribe to receive poetic inspiration and writing prompts
+                    </p>
+                    <form class="flex">
+                        <input type="email" placeholder="Your email" class="form-input px-4 py-2 rounded-l-lg w-full">
+                        <button class="btn-primary px-4 py-2 rounded-r-lg">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="border-t border-white border-opacity-10 mt-12 pt-8 text-center text-white text-opacity-50">
+                <p>&copy; 2025 Kalpanik Duniya. All verses preserved with <i class="fas fa-heart text-red-400"></i></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <a href="#" id="back-to-top" class="fixed bottom-8 right-8 bg-gradient-to-r from-purple-600 to-purple-400 w-12 h-12 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all hidden">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+    <script>
+        // Initialize Vanta Birds effect
+        var vantaEffect = null;
+        
+        function initVanta() {
+            if (window.VANTA) {
+                // Clean up existing effect if any
+                if (vantaEffect) vantaEffect.destroy();
+                
+                // Initialize with options
+                vantaEffect = window.VANTA.BIRDS({
+                    el: "#vanta-birds",
+                    mouseControls: true,
+                    touchControls: true,
+                    gyroControls: false,
+                    minHeight: 200.00,
+                    minWidth: 200.00,
+                    scale: 1.00,
+                    scaleMobile: 1.00,
+                    color2: 0x2f656f,
+                    colorMode: "variance",
+                    backgroundColor: 0x1a1a2e
+                });
+            } else {
+                console.error("VANTA library not loaded");
+                // Fallback background if Vanta fails
+                document.getElementById("vanta-birds").style.backgroundColor = "#1a1a2e";
+            }
+        }
+
+        // Initialize when the DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            initVanta();
+            
+            // Reinitialize on resize to ensure proper rendering
+            window.addEventListener('resize', function() {
+                if (vantaEffect) {
+                    vantaEffect.resize();
+                }
+            });
+            
+            // Back to Top Button
+            window.addEventListener('scroll', function() {
+                const backToTop = document.getElementById('back-to-top');
+                if (window.pageYOffset > 300) {
+                    backToTop.classList.remove('hidden');
+                } else {
+                    backToTop.classList.add('hidden');
+                }
+            });
+            
+            // Form Submission
+            const shayariForm = document.getElementById('shayari-form');
+            if (shayariForm) {
+                shayariForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const title = this.querySelector('input[type="text"]').value;
+                    const content = this.querySelector('textarea').value;
+                    const mood = this.querySelector('input[name="mood"]:checked').value;
+                    
+                    alert(`In a complete implementation, your poem would be saved:\n\nTitle: ${title}\nMood: ${mood}\n\n${content}`);
+                    this.reset();
+                });
+            }
+			
+			
+			document.addEventListener('DOMContentLoaded', function() {
+    // Already existing code...
+    
+    // 1. "Write Now" button in hero section
+    const writeNowBtn = document.querySelector('a[href="#add-shayari"].btn-primary');
+    writeNowBtn.addEventListener('click', function(e) {
+        console.log("Write Now button clicked - Redirecting to compose section");
+        // Additional logic if needed
+    });
+
+    // 2. "Read Collection" button in hero section
+    const readCollectionBtn = document.querySelector('a[href="#my-shayaris"].btn-secondary');
+    readCollectionBtn.addEventListener('click', function(e) {
+        console.log("Read Collection button clicked - Redirecting to poems section");
+    });
+
+    // 3. "Save Poem" button
+    const savePoemBtn = document.querySelector('#shayari-form button[type="submit"]');
+    savePoemBtn.addEventListener('click', function(e) {
+        // The form submission handler already shows a message
+    });
+
+    // 4. "Clear" button in form
+    const clearFormBtn = document.querySelector('#shayari-form button[type="reset"]');
+    clearFormBtn.addEventListener('click', function() {
+        console.log("Form cleared - Ready for new poem");
+    });
+
+    // 5. Load More button
+    const loadMoreBtn = document.querySelector('.btn-secondary i.fa-redo').parentNode;
+    loadMoreBtn.addEventListener('click', function() {
+        console.log("Load more poems clicked - Fetching more content");
+        // In a real app, this would fetch more poems via AJAX
+    });
+
+    // 6. Edit buttons on poem cards
+    document.querySelectorAll('.fa-edit').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const poemId = this.closest('[data-poem-id]').getAttribute('data-poem-id');
+            console.log(`Edit button clicked for poem ID: ${poemId}`);
+            // Would open edit modal/form in real implementation
+        });
+    });
+
+    
+
+    // 8. Profile button in nav
+    const profileBtn = document.querySelector('nav .fa-user').parentNode;
+    profileBtn.addEventListener('click', function(e) {
+        console.log("Profile button clicked - Would show user profile");
+    });
+	
+    });
+            
+            // Smooth scrolling for navigation links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+                    
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
